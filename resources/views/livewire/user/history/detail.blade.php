@@ -176,14 +176,34 @@
                                 below
                                 :
                             </p>
-                            <h3 class="text-3xl font-bold">
-                                @if ($this->getPaymentLogs()['payment_type'] == 'gopay')
-                                    <img class="w-1/3 mx-auto"
-                                        src="{{ $this->getPaymentLogs()['actions'][0]['url'] }}" alt="">
-                                @else
-                                    {{ $this->getPaymentLogs()['va_numbers'][0]['va_number'] }}
-                                @endif
-                            </h3>
+                            @if ($this->getPaymentLogs()['payment_type'] == 'echannel')
+                                <table class="table-auto">
+                                    <tr>
+                                        <th class="md:w-1/2">bill code</th>
+                                        <th class="md:w-1/2">bill key</th>
+                                    </tr>
+                                    <tr class="text-3xl font-bold">
+                                        <td id="bill_code" class="hover:text-blue-500 cursor-pointer"
+                                            onclick="copyToClipboard(this)">
+                                            {{ $this->getPaymentLogs()['biller_code'] }}</td>
+                                        <td id="bill_key" class="hover:text-blue-500 cursor-pointer"
+                                            onclick="copyToClipboard(this)">
+                                            {{ $this->getPaymentLogs()['bill_key'] }}</td>
+                                    </tr>
+                                </table>
+                            @elseif ($this->getPaymentLogs()['payment_type'] == 'qris')
+                                <img class="w-1/3 mx-auto" src="{{ $this->getPaymentLogs()['actions'][0]['url'] }}"
+                                    alt="">
+                            @else
+                                <h3 class="text-3xl font-bold hover:text-blue-500 cursor-pointer" id="va_number"
+                                    onclick="copyToClipboard(this)">
+                                    @if (isset($this->getPaymentLogs()['permata_va_number']))
+                                        {{ $this->getPaymentLogs()['permata_va_number'] }}
+                                    @else
+                                        {{ $this->getPaymentLogs()['va_numbers'][0]['va_number'] }}
+                                    @endif
+                                </h3>
+                            @endif
                             <p class="font-bold text-red-600">
                                 <span>
                                     Make payment before
@@ -247,5 +267,20 @@
                 }
             });
         }
+
+        function copyToClipboard(param) {
+            let name = param.id;
+            let text_nowhitespace = param.textContent.replace(/\s/g, "");
+            navigator.clipboard.writeText(text_nowhitespace);
+
+            Swal.fire({
+                icon: "success",
+                title: "Copied " + name + " to clipboard",
+                showConfirmButton: false,
+                timer: 1000
+            })
+        }
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
 @endsection

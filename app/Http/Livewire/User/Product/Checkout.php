@@ -143,7 +143,9 @@ class Checkout extends Component
             ];
 
             if ($payment_method->payment_type == "bank_transfer") {
-                $this->charge_param = $this->midtransChargeParam($payment_method->payment_type, ["bank" => $payment_method->payment_name]);
+                $this->charge_param = $this->midtransChargeParam($payment_method->payment_type, [
+                    "bank" => $payment_method->payment_name
+                ]);
             } elseif ($payment_method->payment_type == "echannel") {
                 $this->charge_param = $this->midtransChargeParam($payment_method->payment_type, [
                     "bill_info1" => "Payment for:",
@@ -151,14 +153,18 @@ class Checkout extends Component
                 ]);
             } elseif ($payment_method->payment_type == "permata") {
                 $this->charge_param = $this->midtransChargeParam($payment_method->payment_type);
+            } elseif ($payment_method->payment_type == "qris") {
+                $this->charge_param = $this->midtransChargeParam($payment_method->payment_type, [
+                    "acquirer" => "gopay",
+                ]); //aqurier = gopay or shopee
             }
 
             // dd($this->charge_param);
 
             $response = MidtransTransaction::charge($this->charge_param);
-            // $response = json_decode($response, true);
+            $response = json_decode($response);
 
-            if (json_decode($response, true)["status_code"] != "201") {
+            if ($response->status_code != "201") {
                 throw new \Exception("Transaction was failed!");
             }
 
@@ -166,7 +172,7 @@ class Checkout extends Component
             Payment::create([
                 "transaction_id" => $trans->id,
                 "payment_date" => Carbon::now()->format("Y-m-d"),
-                "payment_logs" => $response,
+                "payment_logs" => json_encode($response),
                 "payment_method_id" => $this->methods
             ]);
 
