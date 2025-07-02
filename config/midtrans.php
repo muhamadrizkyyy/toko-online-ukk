@@ -5,4 +5,5 @@ return [
     'client_key' => env('MIDTRANS_CLIENT_KEY'),
     'is_production' => env('MIDTRANS_IS_PRODUCTION', false),
     "sandbox_base_url" => 'https://api.sandbox.midtrans.com/',
+    "demo_url" => "https://motors-occur-dame-flu.trycloudflare.com/",
 ];
