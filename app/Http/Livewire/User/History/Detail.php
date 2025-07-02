@@ -65,10 +65,10 @@ class Detail extends Component
                 $t->transaction_completed = now()->format("Y-m-d");
                 $t->save();
             } else if ($state == "cancelled") {
-                $transaction_id_midtrans = $this->getPaymentLogs()["transaction_id"];
+                $cancel_resp = MidtransTransaction::cancel($t->transaction_code);
+                $cancel_resp = json_decode($cancel_resp->getBody()->getContents());
 
-                $cancel_resp = MidtransTransaction::cancel($transaction_id_midtrans);
-                if ($cancel_resp["status_code"] == "200") {
+                if ($cancel_resp->status_code == "200") {
                     $t->status = "cancelled";
                     $t->transaction_cancelled = now()->format("Y-m-d");
                     $t->save();
@@ -77,9 +77,8 @@ class Detail extends Component
                     $paymentLogs->payment_status = "cancelled";
                     $paymentLogs->payment_logs = json_encode($cancel_resp);
                     $paymentLogs->save();
-                    Log::info("change status transaction success", $cancel_resp);
                 } else {
-                    throw new Exception("Something went wrong! | $cancel_resp");
+                    throw new Exception("Something went wrong! | " . $cancel_resp->status_message);
                 }
             }
 
