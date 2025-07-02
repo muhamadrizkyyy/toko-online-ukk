@@ -11,6 +11,7 @@ use App\Models\Shipping;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\User;
+use App\Services\Midtrans\Transaction as MidtransTransaction;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -44,6 +45,12 @@ class Checkout extends Component
 
     public function checkout()
     {
+        $this->validate([
+            "methods" => "required"
+        ], [
+            "methods" => "Payment methods is must be filled!"
+        ]);
+
         $payment_method = PaymentMethod::find($this->methods);
         $latest = Transaction::latest()->first();
 
@@ -123,7 +130,7 @@ class Checkout extends Component
                 $this->charge_param = $this->midtransChargeParam($payment_method->payment_type);
             }
 
-            $response = Http::withBasicAuth($serverkey, "")->post("https://api.sandbox.midtrans.com/v2/charge", $this->charge_param);
+            $response = MidtransTransaction::charge($this->charge_param);
 
             if (json_decode($response, true)["status_code"] != "201") {
                 throw new \Exception("Transaction was failed!");

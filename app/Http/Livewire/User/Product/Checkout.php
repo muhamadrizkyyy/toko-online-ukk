@@ -12,6 +12,7 @@ use App\Models\Shipping;
 use App\Models\Transaction;
 use App\Models\PaymentMethod;
 use App\Models\TransactionDetail;
+use App\Services\Midtrans\Transaction as MidtransTransaction;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -154,8 +155,7 @@ class Checkout extends Component
 
             // dd($this->charge_param);
 
-            $response = Http::withBasicAuth($serverkey, "")->post("https://api.sandbox.midtrans.com/v2/charge", $this->charge_param);
-            $response = json_encode($response->json());
+            $response = MidtransTransaction::charge($this->charge_param);
             // $response = json_decode($response, true);
 
             if (json_decode($response, true)["status_code"] != "201") {
