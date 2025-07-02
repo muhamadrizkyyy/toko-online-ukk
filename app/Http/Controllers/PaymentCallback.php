@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Transaction;
 use App\Services\Midtrans\Notification;
+use App\Services\Midtrans\VerifySignature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -20,6 +21,9 @@ class PaymentCallback extends Controller
     {
         try {
             $notif = new Notification();
+
+            VerifySignature::verify($notif->gross_amount, $notif->order_id, $notif->status_code, $notif->signature_key);
+
             $trans = Transaction::where("transaction_code", $notif->order_id)->first();
             $paymentLogs = Payment::where("transaction_id", $trans->id)->first();
 
