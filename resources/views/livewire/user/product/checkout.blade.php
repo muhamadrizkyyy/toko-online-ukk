@@ -97,13 +97,48 @@
                     </div>
                 </div>
                 <form class="mt-5">
-                    <div class="mb-6">
-                        <label for="total" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    <div class="mb-5">
+                        <label for="courier" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Courier
+                        </label>
+                        <select id="courier" wire:model="courier"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <option selected readonly>Choose a courier</option>
+                            {{-- @foreach ($this->getPaymentMethod() as $item)
+                                <option value="{{ $item->id }}">{{ $item->payment_name }}</option>
+                            @endforeach --}}
+                            <option value="jne">JNE</option>
+                            <option value="lion">LION PARCEL</option>
+                            <option value="wahana">WAHANA</option>
+                            <option value="pos">POS INDONESIA</option>
+                        </select>
+                        @error('courier')
+                            <span class="text-xs text-red-600 font-bold">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="mb-5">
+                        <label for="fee_shipping" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Fee Shipping
                         </label>
-                        <input type="number" id="total" wire:model="fee_shipping"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="-" readonly />
+                        <select id="fee_shipping" wire:model="fee_shipping"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            @forelse ($this->shipping_info as $item)
+                                <option value="{{ $item['cost'] }}">
+                                    <span class="font-bold">Rp.{{ $item['cost'] }}</span>
+                                    |
+                                    {{ $item['name'] }}
+                                    |
+                                    {{ $item['description'] }}
+                                    |
+                                    {{ $item['etd'] }}
+                                </option>
+                            @empty
+                                <option selected readonly>No Shipping</option>
+                            @endforelse
+                        </select>
+                        @error('fee_shipping')
+                            <span class="text-xs text-red-600 font-bold">{{ $message }}</span>
+                        @enderror
                     </div>
                     <div class="mb-5">
                         <label for="methods" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">

@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
             IndoRegionSeeder::class,
             UserSeeder::class,
             CategorySeeder::class,
-            ShippingSeeder::class,
             PaymentMethodSeeder::class,
         ]);
     }

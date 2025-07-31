@@ -11,13 +11,14 @@ class Show extends Component
 {
     public $transaction_id;
 
-    public $data_trans, $detail_trans,$payments;
+    public $data_trans, $detail_trans, $payments;
 
     public $buyer, $fee_shiping, $trans_date, $total, $code,
-    $trans_send = "-", $trans_pending_cancelled = "-", $trans_cancelled = "-", $trans_completed = "-";
+        $trans_send = "-", $trans_pending_cancelled = "-", $trans_cancelled = "-", $trans_completed = "-";
 
 
-    public function mount($id = null) {
+    public function mount($id = null)
+    {
         if ($id) {
             $t = Transaction::find($id);
             $this->data_trans = $t;
@@ -28,13 +29,11 @@ class Show extends Component
             $this->trans_pending_cancelled = $t->transaction_pending_cancelled;
             $this->trans_cancelled = $t->transaction_cancelled;
             $this->trans_completed = $t->transaction_completed;
-            $this->fee_shiping = $t->shipping->fee;
             $this->buyer = $t->buyer->name;
             $this->total = $t->total;
 
             $this->detail_trans = TransactionDetail::where("transaction_id", $t->id)->get();
             $this->payments = Payment::where("transaction_id", $t->id)->first();
-
         }
     }
 

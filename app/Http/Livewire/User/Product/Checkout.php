@@ -8,11 +8,11 @@ use App\Models\User;
 use App\Models\Payment;
 use App\Models\Product;
 use Livewire\Component;
-use App\Models\Shipping;
 use App\Models\Transaction;
 use App\Models\PaymentMethod;
 use App\Models\TransactionDetail;
 use App\Services\Midtrans\Transaction as MidtransTransaction;
+use App\Services\Rajaongkir\ShippingCost;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -23,7 +23,8 @@ class Checkout extends Component
 {
     public $data_product;
 
-    public $qty = 1, $total = "-", $methods, $fee_shipping, $shipping_id;
+    public $qty = 1, $total = "-", $methods, $weightTotal;
+    public $fee_shipping, $courier, $subDistrictID, $shipping_info = [];
 
     public $charge_param, $transaction_data = [];
 
@@ -31,23 +32,36 @@ class Checkout extends Component
     {
         if ($id) {
             $this->data_product = Product::find($id);
-            $this->getFeeShipping();
+            $this->getWeightTotal();
             $this->getTotal();
         }
-    }
 
-    public function getFeeShipping()
-    {
-        $u = User::find(Auth::id());
-
-        $shipping = Shipping::where("province_id", $u->province_id)->where("regency_id", $u->regency_id)->first();
-        $this->fee_shipping = $shipping->fee;
-        $this->shipping_id = $shipping->id;
+        // get subdistrictID
+        if (!session()->has("subDistrictID")) {
+            $this->subDistrictID = ShippingCost::getSubDistrictID();
+        } else {
+            $this->subDistrictID = session()->get("subDistrictID");
+        }
     }
 
     public function getTotal()
     {
         $this->total = $this->fee_shipping + ($this->data_product->price * $this->qty);
+    }
+
+    public function getWeightTotal()
+    {
+        $this->weightTotal = $this->qty * $this->data_product->weight;
+    }
+
+    public function updatedCourier()
+    {
+        $this->shipping_info = ShippingCost::getDomesticCost(46125, $this->subDistrictID, $this->weightTotal, $this->courier);
+    }
+
+    public function updatedFeeShipping()
+    {
+        $this->getTotal();
     }
 
     public function incrementQty()
@@ -59,6 +73,7 @@ class Checkout extends Component
         }
 
         $this->getTotal();
+        $this->getWeightTotal();
     }
 
     public function decrementQty()
@@ -71,6 +86,7 @@ class Checkout extends Component
 
         if ($this->qty != 0) {
             $this->getTotal();
+            $this->getWeightTotal();
         }
     }
 
@@ -99,7 +115,6 @@ class Checkout extends Component
             $trans = Transaction::create([
                 "transaction_code" => $trx_code,
                 "user_id" => Auth::user()->id,
-                "shipping_id" => $this->shipping_id,
                 "transaction_date" => now()->format("Y-m-d"),
                 "status" => "pending",
                 "amount" => 1,
@@ -126,10 +141,11 @@ class Checkout extends Component
                         "name" => $this->data_product->name,
                         "price" => $this->data_product->price,
                         "quantity" => $this->qty,
+                        "weight" => $this->weightTotal,
                     ],
                     [
                         "name" => "Shipping Fee",
-                        "price" => $this->fee_shipping,
+                        "price" => intval($this->fee_shipping),
                         "quantity" => 1,
                     ],
 
@@ -164,8 +180,9 @@ class Checkout extends Component
             $response = MidtransTransaction::charge($this->charge_param);
             $response = json_decode($response);
 
+
             if ($response->status_code != "201") {
-                throw new \Exception("Transaction was failed!");
+                throw new \Exception("Transaction was failed! " . $response->status_message);
             }
 
 
@@ -178,6 +195,7 @@ class Checkout extends Component
 
             DB::commit();
 
+            session()->forget(["subDistrictID"]);
             return redirect()->route("history")->with("success", "Transaction was successfully created!");
         } catch (\Throwable $th) {
             DB::rollBack();

@@ -7,11 +7,11 @@ use App\Models\Cart;
 use App\Models\Payment;
 use App\Models\PaymentMethod;
 use App\Models\Product;
-use App\Models\Shipping;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\User;
 use App\Services\Midtrans\Transaction as MidtransTransaction;
+use App\Services\Rajaongkir\ShippingCost;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +21,7 @@ use Livewire\Component;
 
 class Checkout extends Component
 {
-    public $province, $regency, $shipping_id, $fee_shipping, $subtotal, $methods;
+    public $province, $regency, $fee_shipping, $courier, $subDistrictID, $shipping_info = [], $subtotal, $methods;
     public $charge_param, $transaction_data = [];
 
     public function mount()
@@ -30,18 +30,31 @@ class Checkout extends Component
         $this->province = $u->province_id;
         $this->regency = $u->regency_id;
 
-        $shipping = Shipping::where("province_id", $this->province)->where("regency_id", $this->regency)->first();
-
-        $this->fee_shipping = $shipping->fee;
-        $this->shipping_id = $shipping->id;
-
         $total = 0;
         foreach ($this->getCartByUser() as $key => $value) {
             $total = $value->subtotal + $total;
         }
 
         $this->subtotal = $total;
+
+        // get subdistrictID
+        if (!session()->has("subDistrictID")) {
+            $this->subDistrictID = ShippingCost::getSubDistrictID();
+        } else {
+            $this->subDistrictID = session()->get("subDistrictID");
+        }
     }
+
+    public function updatedCourier()
+    {
+        $totalWeight = 0;
+        foreach ($this->getCartByUser() as $key => $value) {
+            $totalWeight = $totalWeight + ($value->product->weight * $value->qty);
+        }
+
+        $this->shipping_info = ShippingCost::getDomesticCost(46125, $this->subDistrictID, $totalWeight, $this->courier);
+    }
+
 
     public function checkout()
     {
@@ -68,7 +81,6 @@ class Checkout extends Component
             $trans = Transaction::create([
                 "transaction_code" => $trx_code,
                 "user_id" => Auth::user()->id,
-                "shipping_id" => $this->shipping_id,
                 "transaction_date" => now()->format("Y-m-d"),
                 "status" => "pending",
                 "amount" => count($this->getCartByUser()),
@@ -87,6 +99,7 @@ class Checkout extends Component
                         "name" => "Shipping Fee",
                         "price" => $this->fee_shipping,
                         "quantity" => 1,
+                        "weight" => $this->weightTotal,
                     ]
                 ],
 
@@ -175,6 +188,7 @@ class Checkout extends Component
         return view('livewire.user.cart.checkout')->layout('layouts.user');
     }
 
+    // method request payment midtrans
     private function midtransChargeParam($payment_type, $payment_data = null)
     {
         return MidtransRequestBuilder::build($this->transaction_data, $payment_type, $payment_data);
