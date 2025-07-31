@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Buyer;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -29,11 +30,17 @@ class UserSeeder extends Seeder
             "username" => "andi_07",
             "email" => "andi@gmail.com",
             "password" => Hash::make("andi@gmail.com"),
-            "province_id" => 11,
-            "regency_id" => 1101,
+            "role" => "buyer",
+        ]);
+
+        Buyer::create([
+            "user_id" => 2,
+            "province_id" => 35,
+            "regency_id" => 3517,
+            "district_id" => 3517100,
+            "village_id" => 3517100013,
             "address" => "Jl Gatot Subroto No.9",
             "phone" => "08819502056",
-            "role" => "buyer",
         ]);
     }
 }

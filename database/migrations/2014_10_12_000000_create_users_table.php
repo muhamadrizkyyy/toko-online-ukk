@@ -18,13 +18,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('username');
             $table->string('email')->unique();
-            $table->string('province_id')->nullable();
-            $table->string('regency_id')->nullable();
-            $table->text('address')->nullable();
-            $table->string('phone')->nullable();
             $table->enum("role", ["seller", "buyer", "admin"]);
             $table->string('password');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
