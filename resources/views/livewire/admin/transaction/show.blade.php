@@ -14,7 +14,7 @@
                 <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Transaction Code
                 </label>
-                <input type="text" name="name" id="name" wire:model='code'
+                <input type="text" name="name" id="name" wire:model='code' readonly
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="Bonnie">
                 @error('name')
@@ -25,7 +25,7 @@
                 <label for="buyer" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Buyer
                 </label>
-                <input type="text" buyer="buyer" id="buyer" wire:model='buyer'
+                <input type="text" buyer="buyer" id="buyer" wire:model='buyer' readonly
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="Bonnie">
                 @error('buyer')
@@ -125,16 +125,6 @@
                 @endforeach
             </div>
 
-            <div class="col-span-3">
-                <span class="font-bold mb-3">Payment Information</span>
-                @if ($payments->proof)
-                    <img src="{{ asset('storage/proof/' . $payments->proof) }}" alt="">
-                @else
-                    <p>
-                        Unpaid Transaction
-                    </p>
-                @endif
-            </div>
             <div class="col-span-6">
                 <a href="{{ route('transaction') }}"
                     class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">

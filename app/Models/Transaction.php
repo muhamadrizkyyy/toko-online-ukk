@@ -11,11 +11,8 @@ class Transaction extends Model
 
     protected $guarded = ["id"];
 
-    public function shipping() {
-        return $this->belongsTo(Shipping::class, "shipping_id", "id");
-    }
-
-    public function buyer() {
+    public function buyer()
+    {
         return $this->belongsTo(User::class, "user_id", "id");
     }
 }

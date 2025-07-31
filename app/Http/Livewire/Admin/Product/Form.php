@@ -14,7 +14,7 @@ class Form extends Component
     use WithFileUploads;
 
     public $product_id;
-    public $category_id, $name, $slug, $stock, $price, $image, $desc;
+    public $category_id, $name, $slug, $stock, $weight, $price, $image, $desc;
 
     public function mount($id = null)
     {
@@ -25,6 +25,7 @@ class Form extends Component
             $this->slug = $p->slug;
             $this->price = $p->price;
             $this->stock = $p->stock;
+            $this->weight = $p->weight;
             $this->desc = $p->desc;
             $this->category_id = $p->category_id;
         }
@@ -39,6 +40,7 @@ class Form extends Component
                 "category_id" => "required",
                 "price" => "required",
                 "stock" => "required",
+                "weight" => "required",
                 "desc" => "required",
                 "image" => "nullable|image|mimes:jpg,jpeg,png,webp"
             ]);
@@ -49,6 +51,7 @@ class Form extends Component
                 "category_id" => "required",
                 "price" => "required",
                 "stock" => "required",
+                "weight" => "required",
                 "desc" => "required",
                 "image" => "required|image|mimes:jpg,jpeg,png,webp"
             ]);
@@ -67,6 +70,7 @@ class Form extends Component
                 $p->slug = $this->slug;
                 $p->price = $this->price;
                 $p->stock = $this->stock;
+                $p->weight = $this->weight;
                 $p->desc = $this->desc;
                 $p->category_id = $this->category_id;
                 if ($this->image) {
@@ -81,6 +85,7 @@ class Form extends Component
                     "slug" => $this->slug,
                     "price" => $this->price,
                     "stock" => $this->stock,
+                    "weight" => $this->weight,
                     "category_id" => $this->category_id,
                     "desc" => $this->desc,
                     "image" => $filename,

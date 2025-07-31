@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Regency;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,11 +14,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('shippings', function (Blueprint $table) {
+        Schema::create('districts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("province_id")->constrained("provinces")->onDelete("cascade");
-            $table->foreignId("regency_id")->constrained("regencies")->onDelete("cascade");
-            $table->integer("fee");
+            $table->foreignIdFor(Regency::class)->constrained()->cascadeOnDelete();
+            $table->string('name', 50);
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('shippings');
+        Schema::dropIfExists('districts');
     }
 };

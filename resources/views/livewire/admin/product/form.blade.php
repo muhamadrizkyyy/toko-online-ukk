@@ -73,18 +73,29 @@
                     <span class="text-xs text-red-600 font-bold">{{ $message }}</span>
                 @enderror
             </div>
-            <div class="col-span-6 sm:col-span-3">
+            <div class="col-span-6 sm:col-span-2">
                 <label for="price" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Price
                 </label>
                 <input type="number" price="price" id="price" wire:model='price'
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    placeholder="2">
+                    placeholder="150000">
                 @error('price')
                     <span class="text-xs text-red-600 font-bold">{{ $message }}</span>
                 @enderror
             </div>
-            <div class="col-span-6 sm:col-span-3">
+            <div class="col-span-6 sm:col-span-2">
+                <label for="weight" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    weight
+                </label>
+                <input type="number" name="weight" id="weight" wire:model='weight'
+                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    placeholder="1000 (gram)">
+                @error('weight')
+                    <span class="text-xs text-red-600 font-bold">{{ $message }}</span>
+                @enderror
+            </div>
+            <div class="col-span-6 sm:col-span-2">
                 <label for="stock" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Stock
                 </label>

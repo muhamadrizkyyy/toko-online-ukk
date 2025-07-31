@@ -19,10 +19,12 @@ return new class extends Migration
             $table->string("name");
             $table->string("slug");
             $table->integer("price");
+            $table->double("weight");
             $table->integer("stock");
             $table->string("image");
             $table->text("desc");
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
