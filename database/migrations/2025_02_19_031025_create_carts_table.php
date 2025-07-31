@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer("qty");
             $table->integer("subtotal");
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
