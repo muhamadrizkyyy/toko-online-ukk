@@ -11,15 +11,27 @@ use Livewire\Component;
 
 class Home extends Component
 {
-    public function getCategory() {
+    public function mount()
+    {
+        if (Auth::check()) {
+            if (Auth::user()->role == "admin" || Auth::user()->role == "seller") {
+                return redirect()->route("dashboard.admin");
+            }
+        }
+    }
+
+    public function getCategory()
+    {
         return Category::all();
     }
 
-    public function getProduct($slug = null) {
+    public function getProduct($slug = null)
+    {
         return Product::all();
     }
 
-    public function addToCart($id = null) {
+    public function addToCart($id = null)
+    {
         if (!Auth::check()) {
             return redirect()->route("login")->with("error", "You are not logged in yet");
         }
@@ -50,6 +62,8 @@ class Home extends Component
 
     public function render()
     {
+        // dd(json_decode($data)->data[0]->subdistrict_name);
+
         return view('livewire.user.home')->layout('layouts.user');
     }
 }
