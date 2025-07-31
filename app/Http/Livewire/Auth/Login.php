@@ -14,7 +14,8 @@ class Login extends Component
         "password" => "required"
     ];
 
-    public function login() {
+    public function login()
+    {
         $this->validate();
 
         $credentials = [
@@ -26,18 +27,17 @@ class Login extends Component
             if (Auth::user()->role == "admin" || Auth::user()->role == "seller") {
                 return redirect()->route("dashboard.admin");
             } else {
-                return redirect()->route("home");
+                return redirect()->intended("home");
             }
         } else {
             session()->flash("error", "email & password incorrect");
         }
-
     }
 
-    public function logout() {
+    public function logout()
+    {
         Auth::logout();
         return redirect()->route("login");
-
     }
 
     public function render()
