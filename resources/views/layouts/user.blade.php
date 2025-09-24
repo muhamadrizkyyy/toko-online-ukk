@@ -5,9 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Shop</title>
-    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+    @include('partials.style')
     @livewireStyles
+    @yield('style')
 </head>
 
 <body>
@@ -17,10 +17,10 @@
 
         @include('partials.user.footer')
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @include('partials.script')
     @yield('script')
-    @livewireScripts
+
+    @livewireScripts()
 </body>
 
 </html>

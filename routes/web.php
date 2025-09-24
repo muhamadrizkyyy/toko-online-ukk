@@ -13,8 +13,11 @@ use App\Http\Livewire\Admin\Product\Table as ProductTable;
 use App\Http\Livewire\Admin\Report\Table as ReportTable;
 use App\Http\Livewire\Admin\Transaction\Show as TransactionShow;
 use App\Http\Livewire\Admin\Transaction\Table as TransactionTable;
+use App\Http\Livewire\Auth\EmailVerify;
+use App\Http\Livewire\Auth\ForgotPassword;
 use App\Http\Livewire\Auth\Login;
 use App\Http\Livewire\Auth\Register;
+use App\Http\Livewire\Auth\ResetPassword;
 use App\Http\Livewire\User\Cart\Checkout as CartCheckout;
 use App\Http\Livewire\User\Cart\Table as CartTable;
 use App\Http\Livewire\User\History\Detail;
@@ -22,6 +25,7 @@ use App\Http\Livewire\User\History\Table;
 use App\Http\Livewire\User\Home;
 use App\Http\Livewire\User\Product\Checkout as ProductCheckout;
 use App\Http\Livewire\User\Product\Detail as ProductDetail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -44,15 +48,27 @@ Route::get("/", function () {
 });
 
 Route::get("/login", Login::class)->name("login");
-Route::get("/logout", [Login::class, "logout"])->name("logout");
 Route::get("/register", Register::class)->name("register");
 Route::get("/home", Home::class)->name("home");
 Route::get("/detail-product/{slug}", ProductDetail::class)->name("product.detail");
 Route::post("/callback-notification", PaymentCallback::class)->name("callback-notification");
 
+// route verification email (manual version)
+Route::get("/email/verify", EmailVerify::class)->name("verification.notice");
+Route::get("/email/verify/{id}/{hash}", [EmailVerify::class, "verifyHandler"])->middleware("signed")->name("verification.verify");
+Route::post('/email/verification-notification', [EmailVerify::class, "resendVerificationLink"])->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
-Route::middleware("auth")->group(function () {
+// route forgot password
+Route::middleware("guest")->group(function () {
+    Route::get("/forgot-password", ForgotPassword::class)->name("forgot.index");
+    // Route::post("/forgot-password", [ForgotPassword::class, "sendResetLinkEmail"])->name("forgot.send");
+    Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
+    // Route::post('/reset-password', [ResetPassword::class, "resetPassword"])->name('password.update');
+});
 
+
+Route::middleware(["auth", "verified"])->group(function () {
+    Route::get("/logout", [Login::class, "logout"])->name("logout");
     Route::prefix("admin")->middleware("isAdmin")->group(function () {
         Route::get("/", Dashboard::class)->name("dashboard.admin");
         Route::get("/user", UserTable::class)->name("users");

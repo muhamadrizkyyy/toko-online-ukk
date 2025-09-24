@@ -53,9 +53,9 @@
                     <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Province
                     </label>
-                    <select id="province" wire:model='province_id'
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option selected>Choose a province</option>
+                    <select id="province" wire:model='province_id' onchange="selectchange(this)"
+                        class="bg-gray-50 border selectpicker border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option selected wire:ignore>Choose a province</option>
                         @forelse ($this->getProvince() as $item)
                             <option value="{{ $item->id }}">{{ $item->name }}</option>
                         @empty
@@ -67,12 +67,12 @@
                     @enderror
                 </div>
                 <div class="col-span-6 sm:col-span-3">
-                    <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    <label for="regency" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Regency
                     </label>
-                    <select id="countries" wire:model='regency_id' {{ $province_id ? '' : 'disabled' }}
-                        class="bg-gray-50 border border-gray-300 disabled:bg-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option selected>Choose a regency</option>
+                    <select id="regency" wire:model='regency_id' {{ $province_id ? '' : 'disabled' }}
+                        class="bg-gray-50 border selectpicker border-gray-300 disabled:bg-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option selected wire:ignore>Choose a regency</option>
                         @forelse ($this->getRegencyByProvince() as $item)
                             <option value="{{ $item->id }}">{{ $item->name }}</option>
                         @empty
@@ -80,6 +80,40 @@
                         @endforelse
                     </select>
                     @error('regency_id')
+                        <span class="text-xs text-red-600 font-bold">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        District
+                    </label>
+                    <select id="district" wire:model='district_id' {{ $regency_id ? '' : 'disabled' }}
+                        class="bg-gray-50 border selectpicker border-gray-300 disabled:bg-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option selected wire:ignore>Choose a district</option>
+                        @forelse ($this->getDistrictByRegency() as $item)
+                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                        @empty
+                            <option value="-" selected>-</option>
+                        @endforelse
+                    </select>
+                    @error('district_id')
+                        <span class="text-xs text-red-600 font-bold">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="col-span-6 sm:col-span-3">
+                    <label for="village" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Village
+                    </label>
+                    <select id="village" wire:model='village_id' {{ $district_id ? '' : 'disabled' }}
+                        class="bg-gray-50 border selectpicker border-gray-300 disabled:bg-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option selected wire:ignore>Choose a village</option>
+                        @forelse ($this->getVillageByDistrict() as $item)
+                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                        @empty
+                            <option value="-" selected>-</option>
+                        @endforelse
+                    </select>
+                    @error('village_id')
                         <span class="text-xs text-red-600 font-bold">{{ $message }}</span>
                     @enderror
                 </div>
@@ -117,3 +151,32 @@
         </div>
     </div>
 </div>
+
+@section('script')
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.selectpicker').select2();
+
+            $('#province').on('change', function(e) {
+                var data = $('#province').select2("val");
+                @this.set('province_id', data);
+            });
+            $('#regency').on('change', function(e) {
+                var data = $('#regency').select2("val");
+                @this.set('regency_id', data);
+            });
+            $('#district').on('change', function(e) {
+                var data = $('#district').select2("val");
+                @this.set('district_id', data);
+            });
+            $('#village').on('change', function(e) {
+                var data = $('#village').select2("val");
+                @this.set('village_id', data);
+            });
+
+            $(document).on("livewire:update", function() {
+                $('.selectpicker').select2();
+            })
+        });
+    </script>
+@endsection
